@@ -19,6 +19,7 @@ struct instruction {
 } code [SIZE];
 
 uint pc;
-vector<int> registradores(REGISTERS, 0);
+vector<int> registers(REGISTERS, 0);
+vector<string> dados(SIZE, "");
 
 #endif
