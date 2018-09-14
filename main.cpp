@@ -3,13 +3,15 @@
 int main() {
     string line;
     ifstream file;
+    int inst = 0;
     file.open("instrucoes.txt", ios::out);
-    cout << dados[9] << endl;
     if (file.is_open()) {
         while ( getline(file,line) ) {
-            cout << line << '\n';
+            decode(line, inst);
+            inst++;
         }
         file.close();
     }
+    execute();
     return 0;
 }

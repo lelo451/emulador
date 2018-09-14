@@ -1,1 +1,17 @@
-testando
+LOADI r1, 0
+LOADI r2, 50
+LOADI r3, 0
+ADD r1, r3
+ADD r3, 1
+MOV r4, r3
+SUB r4, 25
+BRZ r4, -4
+MOV r5, r3
+MOV r6, r5
+DIV r5, 2
+ADD r3, 1
+SUB r1, r5
+SUB r6, 50
+BLZ r6, -6
+WRITE r1
+EXIT
