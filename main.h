@@ -7,6 +7,7 @@
 #include <vector>
 #include <sstream>
 #include <stdlib.h>
+#include <unordered_map>
 
 using namespace std;
 
@@ -14,14 +15,24 @@ using namespace std;
 #define REGISTERS 10
 
 void execute();
+
 int aritmetic(int x, int y, int op);
+
 void jump(int x, int y, int op);
+
 void mov(int x, int y);
+
 void loadi(int x, int y);
+
 void write(int x);
+
 void read(int x);
+
 void loadm(int x, int y);
+
 void storem(int x, int y);
+
+void counthotness(int pc);
 
 struct instruction {
     int op;
@@ -36,9 +47,10 @@ struct mem {
 } memoria[SIZE];
 
 int pc = 0;
+//int backjmpflag = 0;
 
 vector<int> registers(REGISTERS, 0);
-
+unordered_map<int, int> hotness;
 
 void decode(string line, int instcount) {
     stringstream stream(line);
@@ -57,7 +69,7 @@ void decode(string line, int instcount) {
         memoria[instcount].code.op = 5;
     } else if (tmp == "LOADM") {
         memoria[instcount].code.op = 6;
-    }  else if (tmp == "STOREM") {
+    } else if (tmp == "STOREM") {
         memoria[instcount].code.op = 7;
     } else if (tmp == "LOADI") {
         memoria[instcount].code.op = 8;
@@ -122,7 +134,7 @@ void execute() {
         } else if (op == 6) {
             loadm(x, y);
             pc++;
-        }  else if (op == 7) {
+        } else if (op == 7) {
             storem(x, y);
             pc++;
         } else if (op == 8) {
@@ -170,30 +182,56 @@ int aritmetic(int x, int y, int op) {
 void jump(int x, int y, int op) {
     switch (op) {
         case 1: // brz
-            if (registers[x] == 0)
+            if (registers[x] == 0) {
                 pc += y;
-            else
+                if (y < 0) {
+                    //backjmpflag = 1;
+                    counthotness(pc);
+                }
+            } else {
+
                 pc++;
+            }
             break;
         case 2: // brnz
-            if(registers[x] != 0)
+            if (registers[x] != 0) {
                 pc += y;
-            else
+                if (y < 0) {
+                    counthotness(pc);
+                }
+            } else
                 pc++;
             break;
         case 3: //ibrz
-            if (registers[x] == 0)
+            if (registers[x] == 0) {
                 pc = y;
-            else
+                if (y < 0) {
+                    counthotness(pc);
+                }
+            } else
                 pc++;
             break;
         case 4: //blz
-            if (registers[x] < 0)
+            if (registers[x] < 0) {
                 pc += y;
-            else
+                if (y < 0) {
+                    counthotness(pc);
+                }
+            } else
                 pc++;
             break;
     }
+}
+
+void counthotness(int pc) {
+    auto it = hotness.find(pc);
+    if (it != hotness.end()) {
+        it->second = it->second + 1;
+        if (it->second >= 50) {
+            cout << "Uma area pegando fogo foi encontrada! " << endl;
+        }
+    } else
+        hotness.insert(make_pair(pc, 1));
 }
 
 void mov(int x, int y) {
